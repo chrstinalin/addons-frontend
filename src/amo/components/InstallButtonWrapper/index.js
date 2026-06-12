@@ -76,6 +76,7 @@ export const InstallButtonWrapperBase = (props: InternalProps): React.Node => {
     showLinkInsteadOfButton,
     uninstall,
     userAgentInfo,
+    desktopViewAndroidCompatible,
   } = props;
 
   const browserIsFirefox = isFirefox({ userAgentInfo });
@@ -131,7 +132,9 @@ export const InstallButtonWrapperBase = (props: InternalProps): React.Node => {
 
   return (
     addon && (
-      <div className="InstallButtonWrapper">
+      <div
+        className={`InstallButtonWrapper ${desktopViewAndroidCompatible ? 'Addon-qr-visible' : ''}`}
+      >
         {!showLinkInsteadOfButton && (
           <>
             {showInstallButton ? (
