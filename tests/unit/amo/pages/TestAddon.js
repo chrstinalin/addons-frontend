@@ -4,6 +4,7 @@ import config from 'config';
 import serialize from 'serialize-javascript';
 import { waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { encode } from 'universal-base64url';
 
 import { createAddonReview, setLatestReview } from 'amo/actions/reviews';
 import { setViewContext } from 'amo/actions/viewContext';
@@ -35,6 +36,10 @@ import {
   EXPERIMENT_CONFIG,
   VARIANT_SHOW,
 } from 'amo/experiments/20210714_amo_vpn_promo';
+import {
+  EXPERIMENT_CONFIG as QR_EXPERIMENT_CONFIG,
+  VARIANT_SHOW as QR_VARIANT_SHOW,
+} from 'amo/experiments/20250512_amo_android_qr_card';
 import { extractId } from 'amo/pages/Addon';
 import {
   FETCH_ADDON,
@@ -2850,6 +2855,70 @@ describe(__filename, () => {
       expect(
         screen.queryByText(/Android is a trademark of Google LLC/),
       ).not.toBeInTheDocument();
+    });
+  });
+
+  describe('Tests for QR card experiment visibility', () => {
+    it('does not render a card for Android extensions if the user is not in the experiment', () => {
+      renderWithAddon();
+      expect(screen.queryByClassName('qr-card')).toBeNull();
+    });
+  });
+
+  describe('Tests for QR card', () => {
+    beforeEach(() => {
+      const fakeConfig = getMockConfig({
+        experiments: {
+          [QR_EXPERIMENT_CONFIG.id]: true,
+        },
+      });
+      config.get.mockImplementation((key) => {
+        return fakeConfig[key];
+      });
+
+      createExperimentCookie({
+        experimentId: QR_EXPERIMENT_CONFIG.id,
+        variant: QR_VARIANT_SHOW,
+      });
+    });
+
+    it('does not render a card for non-Android extensions', () => {
+      addon = {
+        ...addon,
+        current_version: {
+          ...addon.current_version,
+          compatibility: {
+            firefox: addon.current_version.compatibility.firefox,
+          },
+        },
+      };
+      renderWithAddon();
+      expect(screen.queryByClassName('qr-card')).toBeNull();
+    });
+
+    it('does not render a card for Android themes', () => {
+      addon = { ...addon, type: ADDON_TYPE_STATIC_THEME };
+      renderWithAddon();
+      expect(screen.queryByClassName('qr-card')).toBeNull();
+    });
+
+    it('does not render a card on Android', () => {
+      addon = { ...addon, type: ADDON_TYPE_STATIC_THEME };
+      store.dispatch(setClientApp(CLIENT_APP_ANDROID));
+      renderWithAddon();
+      expect(screen.queryByClassName('qr-card')).toBeNull();
+    });
+
+    it('renders a card for Android extensions', () => {
+      renderWithAddon();
+      expect(screen.getByClassName('qr-card')).not.toBeNull();
+      const qr = screen.queryByClassName('qr-code');
+      expect(screen.getByClassName('qr-label')).toHaveTextContent(
+        'Scan the QR code to open this extension in Firefox for Android',
+      );
+      expect(qr.getAttribute('href')).toContain(
+        `utm_content=rta%3A${encode(addon.guid)}`,
+      );
     });
   });
 

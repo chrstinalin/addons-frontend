@@ -57,4 +57,8 @@ module.exports = {
   extensionWorkshopUrl: 'https://extensionworkshop.allizom.org',
 
   langs: devLangs,
+
+  experiments: {
+    '20250512_amo_android_qr_card': true,
+  },
 };

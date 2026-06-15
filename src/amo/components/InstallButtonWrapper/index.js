@@ -40,6 +40,7 @@ export type Props = {|
   // eslint-disable-next-line react/no-unused-prop-types
   version?: AddonVersionType | null,
   showLinkInsteadOfButton?: boolean,
+  desktopViewAndroidCompatible?: boolean,
 |};
 
 type PropsFromState = {|

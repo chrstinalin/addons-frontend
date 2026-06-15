@@ -5,7 +5,7 @@
   border-radius: $border-radius-default;
   min-height: 171px;
   width: 100%;
-  margin: 24px 0 0 0;
+  margin: 24px 0 0;
   padding: 8px;
   display: flex;
   align-items: center;
@@ -26,7 +26,8 @@
   position: relative;
 }
 
-.qr-kit-svg, .qr-code {
+.qr-kit-svg,
+.qr-code {
   width: 100%;
 }
 

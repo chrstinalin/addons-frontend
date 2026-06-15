@@ -473,7 +473,11 @@ export class AddonBase extends React.Component {
                   addon={addon}
                   desktopViewAndroidCompatible={desktopViewAndroidCompatible}
                 />
-                {desktopViewAndroidCompatible ? <QRCard addon={addon} /> : ''}
+                {desktopViewAndroidCompatible ? (
+                  <QRCard addon={addon} i18n={i18n} />
+                ) : (
+                  ''
+                )}
               </div>
 
               {addon && ADDON_TYPE_STATIC_THEME === addon.type && (
